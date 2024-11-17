@@ -1,0 +1,11 @@
+[tool.poetry]
+name = "banking_api"
+version = "0.1.0"
+description = "Banking API"
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry.dependencies]
+python = "^3.11"
