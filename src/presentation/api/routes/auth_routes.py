@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.infrastructure.config.database import get_db
 from src.infrastructure.repositories.user_repository import UserRepository
 from src.application.services.auth_service import AuthService
-from src.presentation.schemas.auth_schemas import Token
+from src.presentation.schemas.auth_schemas import Login, Token
 from src.presentation.schemas.user_schemas import User
 from src.infrastructure.config.settings import settings
 
@@ -24,14 +24,14 @@ async def get_current_user(
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@router.post("/token", response_model=Token)
+@router.post("/login", response_model=Token)
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    login_data: Login,
     db: Session = Depends(get_db)
 ):
     user_repository = UserRepository(db)
     auth_service = AuthService(user_repository)
-    user = auth_service.authenticate_user(form_data.username, form_data.password)
+    user = auth_service.authenticate_user(login_data.email, login_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

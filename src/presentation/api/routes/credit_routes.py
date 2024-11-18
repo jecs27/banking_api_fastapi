@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from src.infrastructure.config.database import get_db
 from src.application.services.credit_service import CreditService
+from src.infrastructure.models.credit import CreditStatus
 from src.presentation.schemas.credit_schemas import CreditCreate, CreditResponse
 from src.infrastructure.security import get_current_user
 from src.infrastructure.models.user import User

@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel, Field
 
-from infrastructure.models.credit import CreditStatus
+from src.infrastructure.models.credit import CreditStatus
 
 class CreditBase(BaseModel):
     amount: Decimal = Field(..., gt=0, description="Loan amount requested")

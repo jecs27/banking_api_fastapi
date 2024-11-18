@@ -3,9 +3,9 @@ from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from infrastructure.repositories.credit_repository import CreditRepository
-from infrastructure.models.credit import Credit, CreditStatus
-from presentation.schemas.credit_schemas import CreditCreate, CreditUpdate
+from src.infrastructure.repositories.credit_repository import CreditRepository
+from src.infrastructure.models.credit import Credit, CreditStatus
+from src.presentation.schemas.credit_schemas import CreditCreate, CreditUpdate
 
 class CreditService:
     def __init__(self, db: Session):

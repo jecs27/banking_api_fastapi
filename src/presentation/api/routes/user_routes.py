@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from src.application.services.auth_service import AuthService
 from src.infrastructure.config.database import get_db
 from src.infrastructure.repositories.user_repository import UserRepository
 from src.presentation.schemas.user_schemas import User, UserCreate, UserUpdate
@@ -21,28 +22,19 @@ def create_user(
             status_code=400,
             detail="The user with this email already exists in the system.",
         )
-    return repo.create(user_in)
-
-@router.get("/", response_model=List[User])
+    user = repo.create(user_in)
+    return user
+    
+@router.get("/", response_model=User)
 def read_users(
-    skip: int = 0,
-    limit: int = 100,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ):
     repo = UserRepository(db)
-    users = repo.get_all(skip=skip, limit=limit)
-    return users
-
-@router.get("/{user_id}", response_model=User)
-def read_user(
-    user_id: int,
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
-):
-    repo = UserRepository(db)
-    user = repo.get_by_id(user_id=user_id)
-    if user is None:
+    auth_service = AuthService(repo)
+    token_data = auth_service.verify_token(token)
+    user = repo.get_by_email(email=token_data.email)
+    if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
