@@ -13,4 +13,5 @@ class User(BaseModel):
     is_superuser = Column(Boolean, default=False)
 
     credits = relationship("Credit", back_populates="user")
+    accounts = relationship("Account", back_populates="user")
 
