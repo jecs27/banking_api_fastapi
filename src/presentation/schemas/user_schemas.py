@@ -12,7 +12,6 @@ class UserCreate(UserBase):
     password: Annotated[str, constr(min_length=8)]
 
 class UserUpdate(UserBase):
-    email: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     password: Optional[Annotated[str, constr(min_length=8)]] = None

@@ -7,7 +7,7 @@ from src.infrastructure.models.credit import CreditStatus
 
 class CreditBase(BaseModel):
     amount: Decimal = Field(..., gt=0, description="Loan amount requested")
-    term_months: int = Field(..., gt=0, le=60, description="Loan term in months")
+    term_months: int = Field(..., gt=0, le=120, description="Loan term in months") 
     purpose: str = Field(..., min_length=3, max_length=255)
 
 class CreditCreate(CreditBase):
@@ -18,7 +18,7 @@ class CreditUpdate(BaseModel):
     approved_at: Optional[datetime]
     interest_rate: Optional[Decimal] = Field(None, gt=0, le=100)
 
-class CreditResponse(CreditBase):
+class CreditInDBBase(CreditBase):
     id: int
     user_id: int
     status: CreditStatus
@@ -31,3 +31,6 @@ class CreditResponse(CreditBase):
 
     class Config:
         from_attributes = True
+
+class CreditResponse(CreditInDBBase):
+    pass

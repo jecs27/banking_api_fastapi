@@ -38,28 +38,30 @@ def read_users(
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@router.put("/{user_id}", response_model=User)
+@router.put("/", response_model=User)
 def update_user(
-    user_id: int,
     user_in: UserUpdate,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ):
     repo = UserRepository(db)
-    user = repo.get_by_id(user_id=user_id)
-    if user is None:
+    auth_service = AuthService(repo)
+    token_data = auth_service.verify_token(token)
+    current_user = repo.get_by_email(email=token_data.email)
+    if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
-    user = repo.update(user_id=user_id, user_data=user_in)
+    user = repo.update(user_id=current_user.id, user_data=user_in)
     return user
 
-@router.delete("/{user_id}", response_model=bool)
+@router.delete("/", response_model=bool)
 def delete_user(
-    user_id: int,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ):
     repo = UserRepository(db)
-    user = repo.get_by_id(user_id=user_id)
-    if user is None:
+    auth_service = AuthService(repo)
+    token_data = auth_service.verify_token(token)
+    current_user = repo.get_by_email(email=token_data.email)
+    if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
-    return repo.delete(user_id=user_id)
+    return repo.delete(user_id=current_user.id)

@@ -34,13 +34,12 @@ class CreditService:
             interest_rate,
             credit_data.term_months
         )
-        
         # Add calculated fields to credit data
         credit_dict = credit_data.model_dump()
-        credit_dict['interest_rate'] = interest_rate
-        credit_dict['monthly_payment'] = monthly_payment
-        credit_dict['remaining_amount'] = credit_data.amount
-        
+        credit_dict['interest_rate'] = credit_dict.get('interest_rate', interest_rate)
+        credit_dict['monthly_payment'] = credit_dict.get('monthly_payment', monthly_payment)
+        credit_dict['remaining_amount'] = credit_dict.get('remaining_amount', credit_data.amount)
+
         return self.repository.create(CreditCreate(**credit_dict), user_id)
 
     def get_credit(self, credit_id: int, user_id: int) -> Credit:
@@ -52,6 +51,8 @@ class CreditService:
         return credit
 
     def get_user_credits(self, user_id: int) -> List[Credit]:
+        if not user_id:
+            raise HTTPException(status_code=404, detail="User not found")
         return self.repository.get_by_user_id(user_id)
 
     def update_credit_status(self, credit_id: int, user_id: int, status: CreditStatus) -> Credit:
