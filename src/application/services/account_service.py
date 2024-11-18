@@ -37,12 +37,10 @@ class AccountService:
 
     def update_account_status(self, account_id: int, user_id: int, status: AccountStatus) -> Account:
         account = self.get_account(account_id, user_id)
-        update_data = AccountUpdate(status=status)
-        return self.repository.update(account_id, update_data)
+        return self.repository.update(account_id, AccountUpdate(status=status))
 
     def check_balance(self, account_id: int, user_id: int) -> Decimal:
-        account = self.get_account(account_id, user_id)
-        return account.balance
+        return self.get_account(account_id, user_id).balance
 
     def validate_account_status(self, account: Account) -> None:
         if account.status != AccountStatus.ACTIVE:
@@ -50,3 +48,6 @@ class AccountService:
                 status_code=400,
                 detail=f"Account is {account.status}. Only ACTIVE accounts can perform transactions"
             )
+
+    def get_account_by_number(self, account_number: str) -> Account:
+        return self.repository.get_by_account_number(account_number)
