@@ -125,101 +125,14 @@ This project follows Clean Architecture principles with a focus on:
 ### API Flow Diagram
 
 ``` mermaid
-graph TB
-    subgraph Client Layer
-        A[Web Client]
-        B[Mobile Client]
-    end
-
-    subgraph API Gateway
-        C[FastAPI Routes]
-        D[Authentication Middleware]
-        E[Request Validation]
-    end
-
-    subgraph Application Layer
-        F[Services]
-        subgraph Services
-            F1[Account Service]
-            F2[Transaction Service]
-            F3[Credit Service]
-            F4[Payment Service]
-            F5[Notification Service]
-            F6[Auth Service]
-        end
-    end
-
-    subgraph Domain Layer
-        G[Domain Models]
-        subgraph Models
-            G1[Account]
-            G2[Transaction]
-            G3[Credit]
-            G4[Payment]
-            G5[User]
-        end
-    end
-
-    subgraph Infrastructure Layer
-        H[Repositories]
-        I[Database]
-        J[External Services]
-        subgraph Repositories
-            H1[Account Repository]
-            H2[Transaction Repository]
-            H3[Credit Repository]
-            H4[User Repository]
-        end
-        subgraph External
-            J1[Email Service]
-            J2[Payment Gateway]
-        end
-    end
-
-    %% Client to API Gateway
-    A --> |HTTP Request| C
-    B --> |HTTP Request| C
-    
-    %% API Gateway Flow
-    C --> D
-    D --> E
-    E --> F
-    
-    %% Service Layer Interactions
-    F1 --> H1
-    F2 --> H2
-    F3 --> H3
-    F4 --> H2
-    F5 --> J1
-    F6 --> H4
-    
-    %% Repository to Database
-    H --> I
-    
-    %% Domain Model Relations
-    G1 --> G2
-    G1 --> G3
-    G3 --> G4
-    G5 --> G1
-
-    %% External Service Integration
-    F5 --> J1
-    F4 --> J2
-
-    %% Color coding
-    classDef gateway fill:#f9f,stroke:#333,stroke-width:2px
-    classDef service fill:#bbf,stroke:#333,stroke-width:2px
-    classDef repository fill:#bfb,stroke:#333,stroke-width:2px
-    classDef model fill:#fbb,stroke:#333,stroke-width:2px
-    classDef external fill:#fff,stroke:#333,stroke-width:2px
-
-    class C,D,E gateway
-    class F1,F2,F3,F4,F5,F6 service
-    class H1,H2,H3,H4 repository
-    class G1,G2,G3,G4,G5 model
-    class J1,J2 external
+graph TD
+A[Client] -->|HTTP Request| B[FastAPI Routes]
+B -->|DTO Validation| C[Services Layer]
+C -->|Business Logic| D[Repositories]
+D -->|Data Access| E[Database]
+C -->|Events| F[Notification Service]
+F -->|Email/Push| G[External Services]
 ```
-
 
 ## Security Features
 
