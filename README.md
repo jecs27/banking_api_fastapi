@@ -99,7 +99,7 @@ uvicorn main:app --reload
 
 ```
 src/
-├── application/        # Application business logic
+├── application/       # Application business logic
 │   └── services/      # Business services
 ├── domain/            # Domain models and business rules
 ├── infrastructure/    # External concerns
@@ -124,7 +124,15 @@ This project follows Clean Architecture principles with a focus on:
 
 ### API Flow Diagram
 
-
+``` mermaid
+graph TD
+A[Client] -->|HTTP Request| B[FastAPI Routes]
+B -->|DTO Validation| C[Services Layer]
+C -->|Business Logic| D[Repositories]
+D -->|Data Access| E[Database]
+C -->|Events| F[Notification Service]
+F -->|Email/Push| G[External Services]
+```
 
 
 ## Security Features
