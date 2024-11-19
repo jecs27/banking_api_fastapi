@@ -63,7 +63,7 @@ Authorization: Bearer <tu_token_de_acceso>
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone <https://github.com/jecs27/banking_api_fastapi.git>
 cd banking-api
 ```
 
@@ -97,17 +97,19 @@ uvicorn main:app --reload
 
 ### Project Structure
 
+```
 src/
-├── application/ # Application business logic
-│ └── services/ # Business services
-├── domain/ # Domain models and business rules
-├── infrastructure/ # External concerns
-│ ├── config/ # Configuration
-│ ├── models/ # Database models
-│ └── repositories/ # Data access
-└── presentation/ # API interface
-├── api/ # API routes
-└── schemas/ # Data transfer object
+├── application/        # Application business logic
+│   └── services/      # Business services
+├── domain/            # Domain models and business rules
+├── infrastructure/    # External concerns
+│   ├── config/        # Configuration
+│   ├── models/        # Database models
+│   └── repositories/  # Data access
+└── presentation/      # API interface
+    ├── api/           # API routes
+    └── schemas/       # Data transfer objects
+```
 
 
 ### Architecture Explanation
