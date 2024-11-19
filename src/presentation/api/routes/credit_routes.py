@@ -65,10 +65,10 @@ def update_credit_status(
     token_data = auth_service.verify_token(token)
     user = repo.get_by_email(email=token_data.email)
     
-    if not user.is_superuser:
+    if not user.is_admin and not user.is_superuser:
         raise HTTPException(
             status_code=403,
-            detail="Only administrators can update credit status"
+            detail="Only administrators or superusers can update credit status"
         )
         
     credit_service = CreditService(db)

@@ -15,6 +15,8 @@ from src.infrastructure.models.user import User
 from src.infrastructure.models.account import Account
 from src.infrastructure.models.credit import Credit
 from src.infrastructure.models.transaction import Transaction
+from src.infrastructure.models.notification import Notification
+from src.infrastructure.models.payment import Payment
 
 config = context.config
 

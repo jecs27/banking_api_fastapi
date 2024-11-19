@@ -2,11 +2,15 @@ from pydantic import BaseModel, EmailStr, constr
 from typing import Optional, Annotated
 from datetime import datetime
 
+from src.infrastructure.models.user import UserRole
+
 class UserBase(BaseModel):
     email: EmailStr
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     is_active: Optional[bool] = True
+    is_superuser: Optional[bool] = False
+    role: Optional[UserRole] = UserRole.USER
 
 class UserCreate(UserBase):
     password: Annotated[str, constr(min_length=8)]

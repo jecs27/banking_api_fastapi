@@ -1,7 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.infrastructure.config.settings import settings
-from src.presentation.api.routes import user_routes, auth_routes, account_routes, credit_routes, transaction_routes
+from src.presentation.api.routes import (
+    user_routes,
+    auth_routes,
+    account_routes,
+    credit_routes,
+    transaction_routes,
+    notification_routes,
+    payment_routes
+)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -11,7 +19,7 @@ app = FastAPI(
 app.swagger_ui_parameters = {
     "defaultModelsExpandDepth": -1,
     "displayRequestDuration": True,
-    "docExpansion": "none",
+    "docExpansion": "none", 
     "filter": True,
 }
 
@@ -28,6 +36,8 @@ app.include_router(user_routes.router, prefix=f"{settings.API_V1_STR}/users", ta
 app.include_router(account_routes.router, prefix=f"{settings.API_V1_STR}/accounts", tags=["accounts"])
 app.include_router(credit_routes.router, prefix=f"{settings.API_V1_STR}/credits", tags=["credits"])
 app.include_router(transaction_routes.router, prefix=f"{settings.API_V1_STR}/transactions", tags=["transactions"])
+app.include_router(notification_routes.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
+app.include_router(payment_routes.router, prefix=f"{settings.API_V1_STR}/payments", tags=["payments"])
 
 @app.get("/")
 async def root():

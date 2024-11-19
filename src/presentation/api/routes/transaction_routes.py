@@ -3,10 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 
+from src.application.services.notification_service import NotificationService
 from src.infrastructure.config.database import get_db
 from src.application.services.transaction_service import TransactionService
 from src.application.services.account_service import AccountService
 from src.application.services.auth_service import AuthService
+from src.infrastructure.models.notification import NotificationPriority, NotificationType
 from src.infrastructure.repositories.user_repository import UserRepository
 from src.presentation.schemas.transaction_schemas import (
     DepositCreate,
@@ -41,7 +43,7 @@ def create_deposit(
     return transaction_service.process_deposit(account_id, deposit_data)
 
 @router.post("/{account_id}/withdrawal", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
-def create_withdrawal(
+async def create_withdrawal(
     account_id: int,
     withdrawal_data: WithdrawalCreate,
     db: Session = Depends(get_db),
@@ -60,7 +62,18 @@ def create_withdrawal(
         raise HTTPException(status_code=404, detail="Account not found")
     
     transaction_service = TransactionService(db)
-    return transaction_service.process_withdrawal(account_id, withdrawal_data)
+    transaction = transaction_service.process_withdrawal(account_id, withdrawal_data)
+    notification_service = NotificationService(db)
+    await notification_service.create_and_send_notification(
+        user_id=current_user.id,
+        type=NotificationType.TRANSACTION,
+        title="Nueva transacción",
+        content=f"Se ha realizado un retiro de <strong>${withdrawal_data.amount:.2f}</strong> desde su cuenta.<br><br>Si no reconoce esta transacción, por favor contáctenos inmediatamente.",
+        priority=NotificationPriority.HIGH,
+        email=current_user.email
+    )
+    print(current_user.email)
+    return transaction
 
 @router.post("/{account_id}/transfer", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 def create_transfer(
