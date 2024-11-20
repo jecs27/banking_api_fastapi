@@ -8,9 +8,6 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Copy .env file
-COPY .env .env
-
 # Load environment variables from .env file
 ARG ENV_FILE=.env
 ENV $(cat $ENV_FILE | xargs)
