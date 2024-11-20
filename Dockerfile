@@ -8,10 +8,6 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Load environment variables from .env file
-ARG ENV_FILE=.env
-ENV $(cat $ENV_FILE | xargs)
-
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -31,4 +27,4 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # Command to run the application
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
