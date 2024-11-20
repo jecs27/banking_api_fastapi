@@ -32,6 +32,3 @@ class Transaction(Base):
 
     account = relationship("Account", foreign_keys=[account_id], back_populates="transactions")
     destination_account = relationship("Account", foreign_keys=[destination_account_id])
-
-    def __repr__(self):
-        return f"<Transaction {self.reference_number}>"

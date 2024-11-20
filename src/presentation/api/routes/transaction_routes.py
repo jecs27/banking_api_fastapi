@@ -72,7 +72,6 @@ async def create_withdrawal(
         priority=NotificationPriority.HIGH,
         email=current_user.email
     )
-    print(current_user.email)
     return transaction
 
 @router.post("/{account_id}/transfer", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)

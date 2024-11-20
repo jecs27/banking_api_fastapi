@@ -12,7 +12,7 @@ class CreditRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, credit_data: CreditCreate, user_id: int) -> Credit:
+    def create(self, credit_data: CreditCreate) -> Credit:
         try:
             credit_dict = credit_data.model_dump()
             if credit_dict.get('interest_rate') is None:
@@ -36,10 +36,7 @@ class CreditRepository:
             if credit_dict.get('remaining_amount') is None:
                 credit_dict['remaining_amount'] = credit_dict['amount']
 
-            db_credit = Credit(
-                user_id=user_id,
-                **credit_dict
-            )
+            db_credit = Credit(**credit_dict)
             self.db.add(db_credit)
             self.db.commit()
             self.db.refresh(db_credit)

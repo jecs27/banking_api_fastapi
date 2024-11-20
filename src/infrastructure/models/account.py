@@ -35,6 +35,3 @@ class Account(Base):
         back_populates="account",
         foreign_keys="[Transaction.account_id]"
     )
-
-    def __repr__(self):
-        return f"<Account {self.account_number}>"

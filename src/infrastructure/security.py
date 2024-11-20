@@ -44,15 +44,15 @@ def create_token(data: dict, token_type: TokenType, expires_delta: Optional[time
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
     return encoded_jwt
 
-def create_tokens(user_id: int, role: UserRole) -> dict:
+def create_tokens(user_id: int, role: UserRole, email: str) -> dict:
     access_token = create_token(
-        data={"sub": str(user_id), "role": role},
+        data={"sub": str(user_id), "role": role, "type": TokenType.ACCESS, "email": email},
         token_type=TokenType.ACCESS,
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     
     refresh_token = create_token(
-        data={"sub": str(user_id), "role": role},
+        data={"sub": str(user_id), "role": role, "type": TokenType.REFRESH, "email": email},
         token_type=TokenType.REFRESH,
         expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     )
@@ -84,14 +84,7 @@ async def get_current_user(
     db: Session = Depends(get_db)
 ) -> User:
     payload = verify_token(token, TokenType.ACCESS)
-    user_id: str = payload.get("sub")
-    
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
-
+    user_id = payload.get("sub")
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(
@@ -100,11 +93,11 @@ async def get_current_user(
         )
     return user
 
-def check_admin_role(user: User = Depends(get_current_user)) -> User:
+def check_admin_role(user: User) -> User:
     if user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions"
+            detail="Not enough permissions, only administrators can access this resource"
         )
     return user
 

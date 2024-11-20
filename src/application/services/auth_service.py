@@ -43,9 +43,9 @@ class AuthService:
             payload = jwt.decode(
                 token, settings.SECRET_KEY, algorithms=["HS256"]
             )
-            email: str = payload.get("sub")
+            email: str = payload.get("email")
             if email is None:
-                raise credentials_exception
+                return None
             token_data = TokenData(email=email)
         except JWTError:
             raise credentials_exception

@@ -30,17 +30,17 @@ class AccountBase(BaseModel):
         return v
 
 class AccountCreate(AccountBase):
+    email: str
     pass
 
 class AccountUpdate(BaseModel):
     status: Optional[AccountStatus]
 
-class AccountResponse(AccountBase):
+class AccountResponse(BaseModel):
     id: int
-    user_id: int
-    account_number: str
+    balance: float
+    currency: str
     status: AccountStatus
-    balance: Decimal
     created_at: datetime
     last_transaction_date: Optional[datetime]
 

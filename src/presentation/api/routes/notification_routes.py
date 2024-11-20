@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from src.infrastructure.config.database import get_db
 from src.infrastructure.models.user import User
 from src.infrastructure.models.notification import NotificationType
-from src.infrastructure.security import get_current_user
+from src.infrastructure.security import check_admin_role, get_current_user
 from src.application.services.notification_service import NotificationService
-from src.presentation.schemas.notification_schemas import NotificationResponse
+from src.presentation.schemas.notification_schemas import NotificationCreate, NotificationResponse
 
 router = APIRouter(tags=["notifications"])
 
@@ -48,3 +48,14 @@ async def mark_all_notifications_read(
     notification_service = NotificationService(db)
     updated_count = notification_service.mark_all_as_read(current_user.id)
     return {"message": f"Marked {updated_count} notifications as read"}
+
+@router.post("/send")
+async def send_notification(
+    notification_data: NotificationCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    check_admin_role(current_user)
+
+    notification_service = NotificationService(db)
+    return notification_service.send_notification(notification_data)

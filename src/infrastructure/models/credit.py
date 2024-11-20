@@ -32,3 +32,4 @@ class Credit(Base):
 
     # Relationships
     user = relationship("User", back_populates="credits")
+    payments = relationship("Payment", back_populates="credit")

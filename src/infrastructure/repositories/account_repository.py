@@ -16,7 +16,7 @@ class AccountRepository:
         db_account = Account(
             user_id=user_id,
             account_number=account_number,
-            **account_data.model_dump()
+            **account_data.model_dump(exclude={'email'})
         )
         try:
             self.db.add(db_account)

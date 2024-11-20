@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from datetime import timedelta
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from src.infrastructure import security
 from src.infrastructure.config.database import get_db
 from src.infrastructure.repositories.user_repository import UserRepository
 from src.application.services.auth_service import AuthService
 from src.presentation.schemas.auth_schemas import Login, Token
 from src.presentation.schemas.user_schemas import User
-from src.infrastructure.config.settings import settings
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -38,16 +37,9 @@ async def login_for_access_token(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = auth_service.create_access_token(
-        data={"sub": user.email, "user_id": user.id},
-        expires_delta=access_token_expires
-    )
-    refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    refresh_token = auth_service.create_refresh_token(
-        data={"sub": user.email},
-        expires_delta=refresh_token_expires
-    )
+    tokens = security.create_tokens(user.id, user.role, user.email)
+    access_token = tokens["access_token"]
+    refresh_token = tokens["refresh_token"]
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,

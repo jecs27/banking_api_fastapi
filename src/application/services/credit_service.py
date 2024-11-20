@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 from src.infrastructure.repositories.credit_repository import CreditRepository
 from src.infrastructure.models.credit import Credit, CreditStatus
@@ -24,7 +25,7 @@ class CreditService:
         monthly_payment = amount * (numerator / denominator)
         return Decimal(round(monthly_payment, 2))
 
-    def create_credit(self, credit_data: CreditCreate, user_id: int) -> Credit:
+    def create_credit(self, credit_data: CreditCreate) -> Credit:
         # Set default interest rate (this could be based on credit score in the future)
         interest_rate = Decimal('12.0')  # 12% annual interest rate
         
@@ -40,7 +41,7 @@ class CreditService:
         credit_dict['monthly_payment'] = credit_dict.get('monthly_payment', monthly_payment)
         credit_dict['remaining_amount'] = credit_dict.get('remaining_amount', credit_data.amount)
 
-        return self.repository.create(CreditCreate(**credit_dict), user_id)
+        return self.repository.create(CreditCreate(**credit_dict))
 
     def get_credit(self, credit_id: int, user_id: int) -> Credit:
         credit = self.repository.get_by_id(credit_id)
@@ -50,12 +51,30 @@ class CreditService:
             raise HTTPException(status_code=403, detail="Not authorized to access this credit")
         return credit
 
+    def get_credit_by_admin(self, credit_id: int) -> Credit:
+        credit = self.repository.get_by_id(credit_id)
+        if not credit:
+            raise HTTPException(status_code=404, detail="Credit not found")
+        return credit
+
     def get_user_credits(self, user_id: int) -> List[Credit]:
         if not user_id:
             raise HTTPException(status_code=404, detail="User not found")
         return self.repository.get_by_user_id(user_id)
 
-    def update_credit_status(self, credit_id: int, user_id: int, status: CreditStatus) -> Credit:
-        credit = self.get_credit(credit_id, user_id)
-        update_data = CreditUpdate(status=status)
-        return self.repository.update(credit_id, update_data)
+    def update_credit_status(self, credit_id: int, status: CreditStatus) -> Credit:
+        credit = self.repository.get_by_id(credit_id)
+        if not credit:
+            raise HTTPException(status_code=404, detail="Credit not found")
+            
+        if credit.status in [CreditStatus.REJECTED, CreditStatus.APPROVED]:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot modify a credit application that has been approved or rejected"
+            )
+
+        update_data = {
+            "status": status,
+            "approved_at": datetime.now() if status == CreditStatus.APPROVED else None
+        }
+        return self.repository.update(credit_id, CreditUpdate(**update_data))

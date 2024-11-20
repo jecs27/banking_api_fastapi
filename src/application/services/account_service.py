@@ -35,8 +35,18 @@ class AccountService:
     def get_user_accounts(self, user_id: int) -> List[Account]:
         return self.repository.get_by_user_id(user_id)
 
-    def update_account_status(self, account_id: int, user_id: int, status: AccountStatus) -> Account:
-        account = self.get_account(account_id, user_id)
+    def get_account_by_admin(self, account_id: int) -> Account:
+        account = self.repository.get_by_id(account_id)
+        if not account:
+            raise HTTPException(status_code=404, detail="Account not found")
+        return account
+
+    def update_account_status(self, account_id: int, status: AccountStatus) -> Account:
+        account = self.get_account_by_admin(account_id)
+        if account.status == status:
+            raise HTTPException(status_code=400, detail="Account status is already set to the desired status")
+        if account.status == AccountStatus.CLOSED:
+            raise HTTPException(status_code=400, detail="Account is closed. Cannot update status")
         return self.repository.update(account_id, AccountUpdate(status=status))
 
     def check_balance(self, account_id: int, user_id: int) -> Decimal:
@@ -51,3 +61,6 @@ class AccountService:
 
     def get_account_by_number(self, account_number: str) -> Account:
         return self.repository.get_by_account_number(account_number)
+    
+    def get_all_accounts(self) -> List[Account]:
+        return self.repository.get_all()

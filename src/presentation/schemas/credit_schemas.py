@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from src.infrastructure.models.credit import CreditStatus
 
 class CreditBase(BaseModel):
+    user_id: int
     amount: Decimal = Field(..., gt=0, description="Loan amount requested")
     term_months: int = Field(..., gt=0, le=120, description="Loan term in months") 
     purpose: str = Field(..., min_length=3, max_length=255)
