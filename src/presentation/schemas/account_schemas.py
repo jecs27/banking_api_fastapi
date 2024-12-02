@@ -43,6 +43,7 @@ class AccountResponse(BaseModel):
     status: AccountStatus
     created_at: datetime
     last_transaction_date: Optional[datetime]
+    account_number: str
 
     class Config:
         from_attributes = True
